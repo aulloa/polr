@@ -1,0 +1,7 @@
+Flask==0.12
+gunicorn==19.7.1
+lxml
+matplotlib
+numpy
+pandas
+requests
