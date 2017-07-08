@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def hello_world():
+def main():
     skills = request.args.get('POLR')
     if skills is not None:
         basic_skills = skills.split(" ")[:20]
@@ -56,20 +56,11 @@ AD = '<p style = "position: relative; bottom: 0; width:100%; text-align: center"
         'data-ad-format="auto"></ins>' \
         '<script>' \
         '(adsbygoogle = window.adsbygoogle || []).push({});' \
-        '</script>' \
-
-FORM = '<form style = "position: fixed;top: 50%;left: 50%;transform: translate(-60%, -60%);}">' \
-        'POLR: Optimize your Skill Sets:<br>' \
-        '<input type="text" size="40" name="POLR"><br>' \
-        '</form>' \
-        '<p style = "position: absolute; bottom: 0; width:100%; text-align: center">' \
-        'Disclaimer: Returns estimate job numbers and salaries from Indeed.<br>' \
-        'Its just our best guess so dont use it to make career decisions.<br> \
-        </p>'
+        '</script>'
 
 
 def make_raw_skill_sets(skills):
-    """makes a list of every combination of skills in a skills list
+    """makes a list of every combination of skills in a skills list maximum 4
 
     Should be read : add all combinations of a certain size to a list for every possible size in the
     the list_of_things.
@@ -144,7 +135,10 @@ class MetaSkillSet(object):
         response.content : html page
             the html page returned by requests
         """
-        response = requests.get('http://www.indeed.com/jobs?', params=self.payload)
+        try:
+            response = requests.get('http://www.indeed.com/jobs?', params=self.payload)
+        except:
+            print "got error for ", self.payload
         self.page = response.content
 
     def skills_to_salary(self):
@@ -198,7 +192,7 @@ def salary_by_skill_set_plot(salaries, skill_set_names):
                            grid=True)
     plot.set_title("Salary by SkillSet", fontsize=40)
     plot.set_xlabel("SkillSet", fontsize=40)
-    plot.set_ylabel("Salary", fontsize=40)
+    plot.set_ylabel("Salary (1000 USD)", fontsize=40)
     fig = plot.get_figure()
     fig.tight_layout()
     figfile = StringIO.StringIO()
@@ -258,7 +252,7 @@ def color_coded_salaries_by_skill_set(salaries, skill_sets, number_of_jobs_list)
     matplotlib.pyplot.gca().get_yaxis().tick_left()
     matplotlib.pyplot.tight_layout()
     matplotlib.pyplot.xlabel("SkillSet", fontsize=40)
-    matplotlib.pyplot.ylabel("Salary", fontsize=40)
+    matplotlib.pyplot.ylabel("Salary (1000 USD)", fontsize=40)
     matplotlib.pyplot.tick_params(labelsize=40)
     matplotlib.pyplot.tight_layout()
     figfile = StringIO.StringIO()
